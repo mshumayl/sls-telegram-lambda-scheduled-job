@@ -23,7 +23,6 @@ def handle_request(event, context):
     return response
 
 def send_to_bot(message):
-    print("In send_to_bot")
     bot_token = os.environ.get("telegram_token")
     chat_id = os.environ.get("chat_id")
     api_message = f"https://api.telegram.org/bot{bot_token}/sendMessage?chat_id={chat_id}&text={message}"
@@ -31,7 +30,6 @@ def send_to_bot(message):
     requests.get(api_message)
 
 def query_data():
-    print("In query_data")
     supabase_url = os.environ.get("supabase_url")
     supabase_key = os.environ.get("supabase_key")
 
@@ -41,7 +39,6 @@ def query_data():
     return data, count
 
 def prepare_message(data, count):
-    print("In prepare_message")
     message = ""
     
     total_attendees = 0
@@ -73,7 +70,6 @@ def prepare_message(data, count):
         
         internal_counter += 1
         
-        print(d)
         total_attendees += d["attendanceCt"]
         
         if d["timeSlot"] == "firstSlot":
@@ -85,18 +81,13 @@ def prepare_message(data, count):
         
         date = d["createdAt"].split("T")[0]
         
-        # print(list(new_attendees_by_day.keys())) 
-         
         new_attendees_by_day[date] += d["attendanceCt"]
         
         current_utc_date = datetime.utcnow().date()
         date_object = datetime.strptime(date, "%Y-%m-%d").date()
         
-        print(f"{date_object=}, {current_utc_date=}")
-        
         if date_object == current_utc_date:
             hour = int(d["createdAt"].split("T")[1].split(":")[0]) + 8
-            print(hour)
             today_new_attendees_by_hour[hour] += d["attendanceCt"]
             
     remaining_slots["first_session"] = f"{350 - attendees_by_session['first_session']}/350"
