@@ -1,0 +1,29 @@
+service: rsvp-updates
+frameworkVersion: '3'
+
+package:
+  exclude:
+    - node_modules/**
+    - __pycache__/**
+
+plugins:
+  - serverless-python-requirements
+
+custom:
+  myEnv: ${file(env/variables.dev.yml)}
+
+provider:
+  name: aws
+  runtime: python3.9
+  region: ${opt:region, "ap-southeast-1"}
+
+functions:
+  handle_request:
+    handler: handler.handle_request
+    memorySize: 128
+    timeout: 120
+    environment:
+      telegram_token: ${self:custom.myEnv.telegramToken}
+      chat_id: ${self:custom.myEnv.chatId}
+      supabase_url: ${self:custom.myEnv.supabaseUrl}
+      supabase_key: ${self:custom.myEnv.supabaseKey}
