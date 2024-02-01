@@ -6,16 +6,20 @@ package:
     - node_modules/**
     - __pycache__/**
 
-plugins:
-  - serverless-python-requirements
-
 custom:
   myEnv: ${file(env/variables.dev.yml)}
+  pythonRequirements:
+    noDeploy: []
+    dockerizePip: true
+
+plugins:
+  - serverless-python-requirements
 
 provider:
   name: aws
   runtime: python3.9
   region: ${opt:region, "ap-southeast-1"}
+  architecture: arm64
 
 functions:
   handle_request:
