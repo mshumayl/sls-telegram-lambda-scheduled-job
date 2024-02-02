@@ -27,7 +27,7 @@ functions:
     memorySize: 128
     timeout: 120
     events:
-      - schedule: rate(2 hours)
+      - schedule: cron(0 * * * ? *)
     environment:
       telegram_token: ${self:custom.myEnv.telegramToken}
       chat_id: ${self:custom.myEnv.chatId}

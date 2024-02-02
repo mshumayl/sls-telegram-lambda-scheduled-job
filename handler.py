@@ -5,6 +5,18 @@ import requests
 from supabase import create_client, Client
 from datetime import datetime, timedelta
 
+session_dict_short = {
+    "firstSlot": "S1",
+    "secondSlot": "S2",
+    "thirdSlot": "S3"
+}
+
+session_dict_long = {
+    "first_session": "(11.30am-1.00pm)",
+    "second_session": "(1.00pm-2.30pm)",
+    "third_session": "(2.30pm-4.00pm)"
+}
+
 def handle_request(event, context):
     data = None
     response = None
@@ -100,6 +112,24 @@ def prepare_message(data, count):
     
     current_time = datetime.utcnow() + timedelta(hours=8)
     
-    message = f"RSVP update as of {current_time}\n\n ---------------------------------------- \n\n{total_attendees=} ({submissions=})\n\n{attendees_by_session=}\n\n{remaining_slots=}\n\n{new_attendees_by_day=}\n\n{today_new_attendees_by_hour=}\n\n{last_5_submissions=}"
-
+    message = f"RSVP Response Update\n{current_time}\n————————————————\nTotal Attendees: {total_attendees} ({submissions} submissions)\n\nAttendees by Session:\n"
+    for k in attendees_by_session.keys():
+        message += f"{session_dict_long[k]} — {attendees_by_session[k]}\n"
+        
+    message += "\nRemaining Slots by Session:\n"
+    for rk in remaining_slots.keys():
+        message += f"{session_dict_long[rk]} — {remaining_slots[rk]}\n"
+        
+    message += "\nNew Attendees Registered by Day:\n"
+    for nbd in new_attendees_by_day.keys():
+        message += f"{nbd} — {new_attendees_by_day[nbd]}\n"
+        
+    message += "\nNew Attendees Registered by Hour (Today):\n"
+    for nbhtoday in today_new_attendees_by_hour.keys():
+        message += f"{nbhtoday}00hrs — {today_new_attendees_by_hour[nbhtoday]}\n"
+            
+    message += "\nLast 5 Responses:\n"
+    for response in last_5_submissions:
+        message += f"{response['createdAt'].split('.')[0].replace('T', ' ').split('0', 1)[1]} — {response['name']}, {response['attendanceCt']}pax ({session_dict_short[response['timeSlot']]})\n"
+    
     return message
